@@ -1,7 +1,9 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { nanoid } from 'nanoid';
 import { getNow } from '@/lib/utils';
+import { nanoid } from 'nanoid';
 
 export async function POST(req: Request) {
     try {
