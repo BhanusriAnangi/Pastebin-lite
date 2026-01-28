@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getNow } from '@/lib/utils';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const now = getNow(req.headers);
 
     try {
         // TRANSACTION: Ensures we check limits AND update count atomically
         const result = await prisma.$transaction(async (tx: any) => {
-            const paste = await tx.paste.findUnique({ where: { id: params.id } });
+            const paste = await tx.paste.findUnique({ where: { id } });
 
             if (!paste) return null;
 
@@ -20,7 +21,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
             // Increment View Count
             return await tx.paste.update({
-                where: { id: params.id },
+                where: { id },
                 data: { view_count: { increment: 1 } }
             });
         });
